@@ -1,0 +1,33 @@
+{
+  "name": "sunoai-contests-server",
+  "version": "1.0.0",
+  "description": "A simple application for SunoAI's contests management. Server-side implementation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --watch --trace-warnings --env-file=.env index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DazornSama/sunoai-contests.git"
+  },
+  "keywords": [
+    "sunoai",
+    "contests",
+    "music",
+    "management",
+    "server"
+  ],
+  "author": "Dazorn",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DazornSama/sunoai-contests/issues"
+  },
+  "homepage": "https://github.com/DazornSama/sunoai-contests#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "mongodb": "^6.8.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  }
+}
