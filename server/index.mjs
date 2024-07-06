@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import bodyParser from "body-parser";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
@@ -9,6 +10,11 @@ const app = express();
 
 const port = process.env.PORT || 5000;
 
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN_URL,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 bindRoutes(app);
@@ -28,7 +34,7 @@ if (process.env.ENV === "DEVELOPMENT") {
         },
       ],
     },
-    apis: ["./routes/*.mjs"],
+    apis: ["./docs/*.js"],
   });
 
   app.use(

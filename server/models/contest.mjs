@@ -12,12 +12,21 @@ const calculateIdByName = (name) => {
   return idParts.join("").toLowerCase();
 };
 
+const escapeDescription = (description) => {
+  return description
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+};
+
 export default class Contest {
   constructor(name, description, startDate, endDate) {
     this._id = null;
     this.id = calculateIdByName(name);
     this.name = name;
-    this.description = description;
+    this.description = escapeDescription(description);
     this.startDate = startDate;
     this.endDate = endDate;
   }
@@ -31,9 +40,24 @@ export default class Contest {
   }
 
   isValid() {
-    return (
-      this.id && this.name && this.description && this.startDate && this.endDate
-    );
+    if (
+      !this.id &&
+      !this.name &&
+      !this.startDate &&
+      !this.endDate &&
+      this.id.length <= 0 &&
+      this.name.length <= 0 &&
+      this.startDate.length <= 0 &&
+      this.endDate.length <= 0
+    ) {
+      return false;
+    }
+
+    if (isNaN(new Date(this.startDate)) || isNaN(new Date(this.endDate))) {
+      return false;
+    }
+
+    return true;
   }
 
   toMongo() {
