@@ -1,0 +1,17 @@
+server {
+    listen       80;
+    server_name  $SERVER_NAME;
+
+    root /usr/share/nginx/html;
+    index index.html index.htm;
+    gzip $GZIP;
+
+    location / {
+      try_files $uri $uri/ /index.html;
+    }
+
+    location ~ \.(html|htm)$ {
+      add_header 'Cache-Control' 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+      expires off;
+    }
+}

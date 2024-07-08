@@ -28,13 +28,12 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=http://localhost:5000
+        - REACT_APP_HOST=http://localhost:3000
     container_name: sunoai-contests-gui
-    environment:
-      - REACT_APP_API_URL=http://localhost:5000
-      - REACT_APP_HOST=http://localhost:3000
-      - NODE_ENV=development
     ports:
-      - "80:3000"
+      - "3000:80"
     stdin_open: true
     networks:
       - backend
