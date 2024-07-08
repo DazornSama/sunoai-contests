@@ -4,7 +4,8 @@
   "description": "A simple application for SunoAI's contests management. Server-side implementation",
   "main": "index.js",
   "scripts": {
-    "start": "node --watch --trace-warnings --env-file=.env index.mjs"
+    "dev": "node --watch --trace-warnings --env-file=.env index.mjs",
+    "prod": "node index.mjs"
   },
   "repository": {
     "type": "git",
