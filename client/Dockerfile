@@ -21,16 +21,12 @@ FROM nginx:stable as deployment
 
 RUN rm /etc/nginx/conf.d/default.conf
 
-COPY ./nginx/entrypoint.sh /usr/local/bin/entrypoint
-
-COPY ./nginx/default.conf.template /etc/nginx/conf.d/default.conf.template
+COPY /nginx/default.conf.template /etc/nginx/conf.d/default.conf.template
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
 COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
-
-ENTRYPOINT [ "entrypoint" ]
 
 CMD ["nginx", "-g", "daemon off;"]
