@@ -1,13 +1,11 @@
-import { useLoaderData } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import {
   ArrowTopRightOnSquareIcon,
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import Layout from "../../shared/layout";
 import { useEffect, useState } from "react";
-import { ContestList } from "./contest.styled";
+import { useLoaderData, useNavigate } from "react-router-dom";
+import Layout from "../../shared/layout";
 import {
   Button,
   ButtonGroup,
@@ -18,7 +16,12 @@ import {
   Snackbar,
   Typography,
 } from "../../utils/mui";
-import { ConfirmDeleteModal, CreateEditModal } from "./contest.modals";
+import {
+  ConfirmDeleteModal,
+  CreateEditModal,
+  EditSongsModal,
+} from "./contest.modals";
+import { ContestList } from "./contest.styled";
 
 const checkAuth = async () => {
   try {
@@ -56,6 +59,13 @@ export default function DataContestView() {
     contest: {},
     loading: false,
   });
+  const [editSongsModal, setEditSongsModal] = useState({
+    open: false,
+    contestId: "",
+    contestName: "",
+    songs: [],
+    loading: false,
+  });
   const [deleteModal, setDeleteModal] = useState({
     open: false,
     contestId: "",
@@ -80,12 +90,138 @@ export default function DataContestView() {
     doCheckAuth();
   }, []);
 
-  const deleteContest = async (contestId) => {
+  const onCreateEditContest = async (
+    id,
+    name,
+    description,
+    startDate,
+    endDate
+  ) => {
+    let result = true;
+
+    try {
+      setCreateEditModal({
+        ...createEditModal,
+        loading: true,
+      });
+
+      let message;
+      let color;
+
+      if (createEditModal.create) {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/contest`,
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name,
+              description: description,
+              start_date: startDate,
+              end_date: endDate,
+            }),
+          }
+        );
+
+        message = `${name} created!`;
+        color = "success";
+
+        if (!response.ok) {
+          if (response.status === 400) {
+            message = await response.text();
+            color = "warning";
+            result = false;
+          } else {
+            throw await response.text();
+          }
+        } else {
+          const contest = await response.json();
+          setContests([...contests, contest]);
+        }
+      } else {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/contest/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name,
+              description: description,
+              start_date: startDate,
+              end_date: endDate,
+            }),
+          }
+        );
+
+        message = `${name} updated!`;
+        color = "success";
+
+        if (!response.ok) {
+          if (response.status === 400) {
+            message = await response.text();
+            color = "warning";
+            result = false;
+          } else if (response.status === 404) {
+            message = `${name} not found!`;
+            color = "warning";
+          } else {
+            throw await response.text();
+          }
+        } else {
+          const contest = await response.json();
+
+          const newContests = contests.map((c) => {
+            if (c.id === id) {
+              return contest;
+            } else {
+              return c;
+            }
+          });
+
+          setContests(newContests);
+        }
+      }
+
+      setSnackbar({
+        show: true,
+        message: message,
+        color: color,
+      });
+    } catch (error) {
+      console.error(error);
+
+      result = false;
+
+      setSnackbar({
+        show: true,
+        message: "Something bad happened",
+        color: "danger",
+      });
+    } finally {
+      setCreateEditModal({
+        ...createEditModal,
+        open: !result,
+        loading: false,
+      });
+    }
+  };
+
+  const deleteContest = async () => {
+    let result = true;
+
     try {
       setDeleteModal({
         ...deleteModal,
         deleting: true,
       });
+
+      const contestId = deleteModal.contestId;
 
       const contest = contests.find((x) => x.id === contestId);
 
@@ -117,16 +253,136 @@ export default function DataContestView() {
       setContests(contests.filter((c) => c.id !== contestId));
 
       setSnackbar({
-        show: "true",
+        show: true,
         message: message,
         color: color,
       });
+    } catch (error) {
+      console.error(error);
 
+      result = false;
+
+      setSnackbar({
+        show: true,
+        message: "Something bad happened",
+        color: "danger",
+      });
+    } finally {
       setDeleteModal({
-        open: false,
+        open: !result,
+        deleting: false,
+      });
+    }
+  };
+
+  const onAddSong = async (
+    id,
+    contestId,
+    title,
+    prompt,
+    author,
+    country,
+    cover
+  ) => {
+    let song = null;
+
+    try {
+      setEditSongsModal({
+        ...editSongsModal,
+        loading: true,
+      });
+
+      let message = `${title} added!`;
+      let color = "success";
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/song`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          contest_id: contestId,
+          title: title,
+          prompt: prompt,
+          author: author,
+          cover: cover,
+          country: country,
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 400 || response.status === 409) {
+          message = await response.text();
+          color = "warning";
+        } else {
+          throw await response.text();
+        }
+      } else {
+        song = await response.json();
+      }
+
+      setSnackbar({
+        show: true,
+        message: message,
+        color: color,
       });
     } catch (error) {
       console.error(error);
+
+      setSnackbar({
+        show: true,
+        message: "Something bad happened",
+        color: "danger",
+      });
+    } finally {
+      setEditSongsModal({
+        ...editSongsModal,
+        loading: false,
+        songs: song ? [...editSongsModal.songs, song] : editSongsModal.songs,
+      });
+    }
+  };
+
+  const onDeleteSong = async (songId, songTitle) => {
+    let result = true;
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/song/${encodeURIComponent(songId)}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      let message = `${songTitle} deleted!`;
+      let color = "success";
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          message = `${songTitle} not found!`;
+          color = "warning";
+        } else {
+          throw await response.text();
+        }
+      }
+
+      setEditSongsModal({
+        ...editSongsModal,
+        songs: editSongsModal.songs.filter((s) => s.id !== songId),
+      });
+
+      setSnackbar({
+        show: true,
+        message: message,
+        color: color,
+      });
+    } catch (error) {
+      console.error(error);
+
+      result = false;
+
       setSnackbar({
         show: true,
         message: "Something bad happened",
@@ -198,7 +454,19 @@ export default function DataContestView() {
           >
             Edit details
           </Button>
-          <Button>Edit songs</Button>
+          <Button
+            onClick={async () => {
+              setEditSongsModal({
+                ...editSongsModal,
+                open: true,
+                contestId: c.id,
+                contestName: c.name,
+                songs: await dataContestSongsLoader(c.id),
+              });
+            }}
+          >
+            Edit songs
+          </Button>
         </CardActions>
       </Card>
     );
@@ -232,13 +500,24 @@ export default function DataContestView() {
         onClose={() => setCreateEditModal({ open: false })}
         create={createEditModal.create}
         contest={createEditModal.contest}
+        onConfirm={onCreateEditContest}
         loading={createEditModal.loading}
+      />
+      <EditSongsModal
+        open={editSongsModal.open}
+        onClose={() => setEditSongsModal({ open: false, songs: [] })}
+        contestId={editSongsModal.contestId}
+        contestName={editSongsModal.contestName}
+        songs={editSongsModal.songs}
+        onAdd={onAddSong}
+        onDelete={onDeleteSong}
+        loading={editSongsModal.loading}
       />
       <ConfirmDeleteModal
         open={deleteModal.open}
         onClose={() => setDeleteModal({ open: false })}
         contestName={deleteModal.contestName}
-        onConfirm={() => deleteContest(deleteModal.contestId)}
+        onConfirm={deleteContest}
         deleting={deleteModal.deleting}
       />
       <Snackbar
@@ -246,6 +525,8 @@ export default function DataContestView() {
         variant="outlined"
         open={snackbar.show}
         color={snackbar.color}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, show: false })}
       >
         {snackbar.message}
       </Snackbar>
@@ -255,5 +536,24 @@ export default function DataContestView() {
 
 export const dataContestLoader = async ({ params }) => {
   const response = await fetch(`${process.env.REACT_APP_API_URL}/contest`);
+
+  if (!response.ok) {
+    return [];
+  }
+
   return await response.json();
+};
+
+const dataContestSongsLoader = async (contestId) => {
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/contest/${encodeURIComponent(
+      contestId
+    )}/songs`
+  );
+
+  if (response.ok) {
+    return await response.json();
+  }
+
+  return [];
 };

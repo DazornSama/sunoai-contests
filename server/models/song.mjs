@@ -28,7 +28,10 @@ export default class Song {
       !this.prompt &&
       !this.author &&
       !this.country &&
-      !this.cover &&
+      !this.cover
+    ) {
+      return false;
+    } else if (
       this.id.length <= 0 &&
       this.contest_id.length <= 0 &&
       this.title.length <= 0 &&

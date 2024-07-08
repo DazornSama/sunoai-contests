@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
-import { useLoaderData } from "react-router-dom";
 import CountryFlag from "react-country-flag";
+import Markdown from "react-markdown";
+import { useLoaderData } from "react-router-dom";
 import CountryFlagEmoji from "../components/country-flag-emoji";
 import Layout from "../shared/layout";
+import { Typography } from "../utils/mui";
 import {
-  SongList,
+  ContestDescription,
   Song,
+  SongAuthor,
+  SongCountry,
   SongCover,
   SongInfo,
-  SongTitle,
-  SongAuthor,
+  SongList,
   SongPrompt,
-  SongCountry,
+  SongTitle,
 } from "./contest.styled";
-import { Typography } from "../utils/mui";
 
 export default function ContestView() {
   const [contest, setContest] = useState(useLoaderData());
@@ -55,7 +57,7 @@ export default function ContestView() {
           </SongPrompt>
         </SongInfo>
         <SongCountry>
-          <CountryFlagEmoji code={s.country} />
+          <CountryFlagEmoji code={s.country} iso={true} />
         </SongCountry>
       </Song>
     );
@@ -64,6 +66,18 @@ export default function ContestView() {
   return (
     <Layout>
       <Typography level="h1">{contest.name}</Typography>
+      <ContestDescription>
+        <Typography level="body-sm">
+          <Markdown className="markdown">
+            {contest.description
+              .replace(/&amp;/g, "&")
+              .replace(/&lt;/g, "<")
+              .replace(/&gt;/g, ">")
+              .replace(/&quot;/g, '"')
+              .replace(/&#39;/g, "'")}
+          </Markdown>
+        </Typography>
+      </ContestDescription>
       <SongList>
         {songsElement.length === 0 ? (
           <div>

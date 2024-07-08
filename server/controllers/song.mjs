@@ -60,11 +60,20 @@ export const addOne = async (request, response) => {
     } else {
       const collection = await db.collection(COLLECTION_NAME);
 
-      const result = await collection.insertOne(song.toMongo());
+      const existing = await collection.findOne({
+        id: song.id,
+        contest_id: song.contest_id,
+      });
 
-      song.mongoId = result.insertedId;
+      if (existing) {
+        response.status(409).send("Song already exists");
+      } else {
+        const result = await collection.insertOne(song.toMongo());
 
-      response.status(200).send(song);
+        song.mongoId = result.insertedId;
+
+        response.status(200).send(song);
+      }
     }
   } catch (error) {
     console.error(error);
@@ -149,6 +158,54 @@ export const deleteOne = async (request, response) => {
 
       response.status(200).send();
     }
+  } catch (error) {
+    console.error(error);
+    response.status(500).send(error);
+  }
+};
+
+export const getInfo = async (request, response) => {
+  try {
+    const songId = request.params.id.trim();
+
+    if (!songId) {
+      response.status(400).send('Missing ":id" parameter');
+    }
+
+    const result = await fetch(`https://suno.com/song/${songId}`, {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        Host: "https://suno.com",
+        Origin: "https://suno.com",
+        Referer: "https://suno.com",
+      },
+    });
+
+    if (!result.ok) {
+      throw new Error("Error while reading suno.com body");
+    }
+
+    const body = await result.text();
+
+    let regex = /\\"title\\":\\"(.[^\\]*)\\"/g;
+    const title = regex.exec(body)[1];
+
+    regex = /\\"metadata\\":{\\"tags\\":\\"(.[^\\]*)\\",/g;
+    const prompt = regex.exec(body)[1];
+
+    regex = /\\"display_name\\":\\"(.[^\\]*)\\",/g;
+    const author = regex.exec(body)[1];
+
+    regex = /\\"image_url\\":\\"(.[^\\]*)\\",/g;
+    const cover = regex.exec(body)[1];
+
+    response.status(200).send({
+      title,
+      prompt,
+      author,
+      cover,
+    });
   } catch (error) {
     console.error(error);
     response.status(500).send(error);

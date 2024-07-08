@@ -1,5 +1,14 @@
 import styled from "@emotion/styled";
 
+export const ContestDescription = styled.div`
+  margin-top: 1rem;
+  padding: 1.25rem;
+  border-radius: 0.375rem;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.3);
+`;
+
 export const SongList = styled.div`
   margin-top: 3rem;
   display: grid;

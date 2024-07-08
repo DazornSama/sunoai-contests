@@ -13,6 +13,10 @@ const calculateIdByName = (name) => {
 };
 
 const escapeDescription = (description) => {
+  if (!description) {
+    return description;
+  }
+
   return description
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -24,7 +28,11 @@ const escapeDescription = (description) => {
 export default class Contest {
   constructor(name, description, startDate, endDate) {
     this._id = null;
-    this.id = calculateIdByName(name);
+
+    if (name) {
+      this.id = calculateIdByName(name);
+    }
+
     this.name = name;
     this.description = escapeDescription(description);
     this.startDate = startDate;
@@ -44,8 +52,10 @@ export default class Contest {
       !this.id &&
       !this.name &&
       !this.startDate &&
-      !this.endDate &&
-      this.id.length <= 0 &&
+      !this.endDate) {
+      return false;
+    }
+    else if (this.id.length <= 0 &&
       this.name.length <= 0 &&
       this.startDate.length <= 0 &&
       this.endDate.length <= 0
