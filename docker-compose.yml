@@ -30,6 +30,7 @@ services:
       args:
         - REACT_APP_API_URL=http://localhost:5000
         - REACT_APP_HOST=http://localhost:3000
+        - SERVER_NAME=localhost
     container_name: sunoai-contests-gui
     ports:
       - "3000:80"

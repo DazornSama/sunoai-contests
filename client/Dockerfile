@@ -19,6 +19,8 @@ RUN npm run build
 
 FROM nginx:stable as deployment
 
+ARG SERVER_NAME
+
 RUN rm /etc/nginx/conf.d/default.conf
 
 COPY /nginx/default.conf.template /etc/nginx/conf.d/default.conf.template
@@ -27,7 +29,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 COPY --from=build /app/build /usr/share/nginx/html
 
-ENV SERVER_NAME 'localhost'
+ENV SERVER_NAME ${SERVER_NAME}
 ENV GZIP 'on'
 
 EXPOSE 80
