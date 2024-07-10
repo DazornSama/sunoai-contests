@@ -27,6 +27,9 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 COPY --from=build /app/build /usr/share/nginx/html
 
+ENV SERVER_NAME 'localhost'
+ENV GZIP 'on'
+
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
