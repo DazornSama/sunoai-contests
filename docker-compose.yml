@@ -48,10 +48,29 @@ services:
     networks:
       - database
 
+  # PRODUCTION-ONLY
+  # reverse-proxy:
+  #   image: valian/docker-nginx-auto-ssl:1.0.0
+  #   container_name: sunoai-contests-reverse-proxy
+  #   restart: on-failure
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./.ssl-data:/etc/resty-auto-ssl
+  #   environment:
+  #     - ALLOWED_DOMAINS="(app|admin).localhost"
+  #     - SITES="app.localhost=gui:3000;admin.localhost=api:5000"
+  #     - FORCE_HTTPS="true"
+  #   depends_on:
+  #     - api
+  #     - gui
+
 volumes:
   api_data:
   api_node_modules:
   mongodb_data:
+  .ssl-data:
 
 networks:
   database:

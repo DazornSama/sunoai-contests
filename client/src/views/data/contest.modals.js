@@ -28,6 +28,10 @@ import {
   Textarea,
   Typography,
 } from "../../utils/mui";
+import {
+  CreateEditModalDescriptionWrapper,
+  EditSongsModalWrapper,
+} from "./contest.styled";
 
 Countries.registerLocale(CountriesEnglishLocale);
 
@@ -278,14 +282,7 @@ export function CreateEditModal(props) {
             </FormControl>
             <FormControl error={form.descriptionError.length > 0}>
               <FormLabel>Description</FormLabel>
-              <div
-                style={{
-                  display: "flex",
-                  height: "420px",
-                  maxHeight: "420px",
-                  overflow: "hidden",
-                }}
-              >
+              <CreateEditModalDescriptionWrapper>
                 <Textarea
                   placeholder="Type here the contest description... (markdown supported)"
                   size="md"
@@ -298,6 +295,7 @@ export function CreateEditModal(props) {
                   }}
                 />
                 <div
+                  className="markdown-container"
                   style={{
                     position: "relative",
                     flex: 1,
@@ -321,7 +319,7 @@ export function CreateEditModal(props) {
                   </IconButton>
                   <Markdown className="markdown">{form.description}</Markdown>
                 </div>
-              </div>
+              </CreateEditModalDescriptionWrapper>
               <FormHelperText>{form.descriptionError}</FormHelperText>
             </FormControl>
             <div
@@ -646,7 +644,7 @@ export function EditSongsModal(props) {
         <ModalClose variant="plain" sx={{ m: 1 }} />
         <DialogTitle>Edit {props.contestName} songs</DialogTitle>
         <DialogContent>
-          <div style={{ display: "flex", marginTop: "3rem" }}>
+          <EditSongsModalWrapper>
             <div style={{ flex: "1" }}>
               <Typography level="h5">Add a new one</Typography>
               <Stack spacing={2} style={{ marginTop: "1.25rem" }}>
@@ -753,6 +751,7 @@ export function EditSongsModal(props) {
               </Stack>
             </div>
             <div
+              className="songs-container"
               style={{
                 flex: "4",
                 marginLeft: "1.25rem",
@@ -774,7 +773,7 @@ export function EditSongsModal(props) {
                 </div>
               )}
             </div>
-          </div>
+          </EditSongsModalWrapper>
         </DialogContent>
       </ModalDialog>
     </Modal>
