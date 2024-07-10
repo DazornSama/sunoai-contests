@@ -12,6 +12,9 @@ const port = process.env.PORT || 5000;
 
 const corsOptions = {
   origin: process.env.CORS_ORIGIN_URL,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
