@@ -167,6 +167,7 @@ export const getSongs = async (request, response) => {
       const songsCollection = await db.collection("songs");
       const songs = await songsCollection
         .find({ contest_id: contestId })
+        .sort({ title: 1 })
         .toArray();
 
       if (songs.length === 0) {
