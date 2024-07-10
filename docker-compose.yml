@@ -16,9 +16,6 @@ services:
       - "5000:5000"
     depends_on:
       - mongodb
-    volumes:
-      - api_data:/app
-      - api_node_modules:/app/node_modules
     networks:
       - database
       - backend
@@ -69,8 +66,6 @@ services:
   #     - backend
 
 volumes:
-  api_data:
-  api_node_modules:
   mongodb_data:
   .ssl-data:
 
