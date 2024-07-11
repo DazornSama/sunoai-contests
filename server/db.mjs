@@ -3,6 +3,12 @@ import { MongoClient } from "mongodb";
 const connectionString = process.env.MONGODB_URL;
 const dbString = process.env.MONGODB_DB;
 
+const prepareDb = async (db) => {
+  await (
+    await db.collection("songs")
+  ).createIndex({ title: 1 }, { collation: { locale: "en", strength: 2 } });
+};
+
 if (!connectionString) {
   console.error('"MONGODB_URL" env var not found!');
 }
@@ -20,4 +26,8 @@ try {
   console.error(e);
 }
 
-export default conn.db(dbString);
+const db = conn.db(dbString);
+
+await prepareDb(db);
+
+export default db;
