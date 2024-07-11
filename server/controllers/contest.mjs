@@ -168,6 +168,7 @@ export const getSongs = async (request, response) => {
       const songs = await songsCollection
         .find({ contest_id: contestId })
         .sort({ title: 1 })
+        .collation({ locale: "en", strength: 2 })
         .toArray();
 
       if (songs.length === 0) {
